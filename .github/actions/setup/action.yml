@@ -19,9 +19,6 @@ outputs:
 runs:
   using: 'composite'
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
     - name: Install Rust stable
       uses: dtolnay/rust-toolchain@stable
       with:
