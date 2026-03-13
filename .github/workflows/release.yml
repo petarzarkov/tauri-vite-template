@@ -26,6 +26,9 @@ jobs:
     name: Build (${{ matrix.artifact }})
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Setup
         id: setup
         uses: ./.github/actions/setup
