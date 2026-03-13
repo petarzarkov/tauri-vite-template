@@ -17,6 +17,9 @@ dist/
 # Tauri build output
 service/WixTools/
 
+# Tauri generated schemas (auto-generated, not to be tracked or linted)
+service/gen/
+
 # Environment files
 .env
 .env.local

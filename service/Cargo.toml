@@ -17,15 +17,12 @@ tauri-plugin-shell = { version = "2" }
 serde         = { version = "1", features = ["derive"] }
 serde_json    = { version = "1" }
 
-tokio         = { version = "1", features = ["rt", "rt-multi-thread", "sync", "time", "macros"] }
+tokio         = { version = "1", features = ["rt", "rt-multi-thread", "macros"] }
 
-crc           = { version = "3" }
 rand          = { version = "0.9" }
 
 log           = { version = "0.4" }
 env_logger    = { version = "0.11" }
-
-serialport    = { version = "4" }
 
 [features]
 default        = ["mock"]
