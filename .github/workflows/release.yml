@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"         # triggers on git tag v0.1.0, v1.2.3, etc.
+  workflow_dispatch: # also allows manual trigger from GitHub UI
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: windows
+          - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            artifact: linux
+
+    runs-on: ${{ matrix.platform }}
+    name: Build (${{ matrix.artifact }})
+
+    steps:
+      # -----------------------------------------------------------------------
+      # Checkout
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # Rust toolchain
+      # -----------------------------------------------------------------------
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Cache Rust build artefacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "service -> service/target"
+
+      # -----------------------------------------------------------------------
+      # Linux system dependencies (WebKit2GTK + serialport deps)
+      # -----------------------------------------------------------------------
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            pkg-config \
+            build-essential \
+            libwebkit2gtk-4.1-dev \
+            libssl-dev \
+            libgtk-3-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            libudev-dev
+
+      # -----------------------------------------------------------------------
+      # Bun + frontend dependencies
+      # -----------------------------------------------------------------------
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install frontend dependencies
+        run: bun install
+
+      # -----------------------------------------------------------------------
+      # Build
+      # -----------------------------------------------------------------------
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Tauri Vite Template ${{ github.ref_name }}"
+          releaseBody: |
+            See [CHANGELOG](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+          releaseDraft: true
+          prerelease: false
+          args: --config service/tauri.conf.json --target ${{ matrix.target }}
