@@ -1,6 +1,6 @@
 {
   "name": "tauri-vite-template",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "description": "Tauri Vite Template - A starter template for building Tauri applications with Vite and React.",
   "type": "module",
