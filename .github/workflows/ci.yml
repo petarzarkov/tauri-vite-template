@@ -16,6 +16,8 @@ jobs:
 
       - name: Setup
         uses: ./.github/actions/setup
+        with:
+          setup-rust: 'false'
 
       - name: Check & Typecheck
         run: bun run --parallel check typecheck

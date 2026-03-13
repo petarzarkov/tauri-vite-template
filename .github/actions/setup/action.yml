@@ -6,6 +6,10 @@ inputs:
     description: 'The Bun version to use'
     required: false
     default: 'latest'
+  setup-rust:
+    description: 'Whether to set up Rust toolchain'
+    required: false
+    default: 'true'
   rust-targets:
     description: 'Comma-separated list of Rust targets to install'
     required: false
@@ -20,11 +24,13 @@ runs:
   using: 'composite'
   steps:
     - name: Install Rust stable
+      if: inputs.setup-rust == 'true'
       uses: dtolnay/rust-toolchain@stable
       with:
         targets: ${{ inputs.rust-targets }}
 
     - name: Cache Rust build artefacts
+      if: inputs.setup-rust == 'true'
       uses: Swatinem/rust-cache@v2
       with:
         workspaces: "service -> service/target"
